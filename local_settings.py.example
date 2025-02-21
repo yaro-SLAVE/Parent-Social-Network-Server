@@ -1,0 +1,12 @@
+from app.settings import *
+
+DATABASES = {
+    'default':{
+        'ENGINE':'mssql',                    
+        'NAME':'db_name',                       
+        'HOST':'server_name', 
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+        },
+    }
+}
