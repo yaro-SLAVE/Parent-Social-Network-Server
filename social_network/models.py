@@ -41,8 +41,14 @@ class Post(models.Model):
 
 class PostPhoto(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    child = models.ForeignKey(Child, on_delete=models.CASCADE)
     photo = models.ImageField("Фото ребенка", upload_to="images")
+
+    def __str__(self) -> str:
+        return self.post.title + " " + self.post.user.username + " " + self.photo
+
+class ChildPhoto(models.Model):
+    photo = models.ForeignKey(PostPhoto, on_delete=models.CASCADE)
+    child = models.ForeignKey(Child, on_delete=models.CASCADE)
 
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
