@@ -24,6 +24,7 @@ class UserBasement(models.Model):
 
 class Child(models.Model):
     first_name = models.TextField("Имя")
+    gender = models.TextField("Пол")
     birth_date = models.DateField("Дата рождения")
     basement = models.ForeignKey(Basement, on_delete=models.CASCADE)
 

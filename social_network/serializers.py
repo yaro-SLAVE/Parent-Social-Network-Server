@@ -139,7 +139,7 @@ class GenerateUsersSerializer(serializers.Serializer):
         age_days_max = 365 * 30
         age_days_min = 365 * 20
 
-        for _ in range(int(fakers_count // 2)):
+        for _ in range(int(fakers_count / 2)):
             user = User.objects.create(
                 username = fake.user_name(),
                 password = make_password(fake.password()),
@@ -156,7 +156,7 @@ class GenerateUsersSerializer(serializers.Serializer):
                 )
             )
 
-        for _ in range(fakers_count - int(fakers_count // 2)):
+        for _ in range(fakers_count - int(fakers_count / 2)):
             user = User.objects.create(
                 username = fake.user_name(),
                 password = make_password(fake.password()),
@@ -174,3 +174,79 @@ class GenerateUsersSerializer(serializers.Serializer):
             )
 
         return validated_data
+    
+class GenerateBasementsSerializer(serializers.Serializer):
+    fakers_count = serializers.IntegerField()
+
+    def create(self, validated_data):
+        fakers_count = self.context["request"].data["fakers_count"]
+
+        fake = Faker(['ru_RU'])
+
+        for _ in range(int(fakers_count / 2)):
+            Basement.objects.create(
+                address = fake.street_address(),
+                capacity = fake.random_int(5, 27, 1)
+            )
+
+        return validated_data
+    
+class GenerateChildssSerializer(serializers.Serializer):
+    fakers_count = serializers.IntegerField()
+
+    def create(self, validated_data):
+        fakers_count = self.context["request"].data["fakers_count"]
+
+        fake = Faker(['ru_RU'])
+
+        parents_count = UserProfile.objects.count()
+        basements_count = Basement.objects.count()
+
+        users = UserProfile.objects.all()
+        basements = Basement.objects.all()
+
+        for i in range(int(fakers_count / 2)):
+
+            parent_1 = parents_count - fakers_count + 1 + i
+            parent_2 = parents_count - fakers_count / 2 + 1 + i
+            current_basement = basements_count - fakers_count / 2 + 1 +i
+
+            UserBasement.objects.create(
+                user = users.get(id=parent_1).user,
+                basement = basements.get(id=current_basement)
+            )
+
+            UserBasement.objects.create(
+                user = users.get(id=parent_2).user,
+                basement = basements.get(id=current_basement)
+            )
+
+            min_age = max(
+                users.get(id=parent_1).birth_date,
+                users.get(id=parent_2).birth_date
+            )
+
+            rand = random.randint(0, 1)
+
+            first_name = ""
+            gender = ""
+
+            if rand == 0:
+                first_name = fake.first_name_male()
+                gender = "мужской"
+            else:
+                first_name = fake.first_name_female()
+                gender = "женский"
+
+            Child.objects.create(
+                first_name = first_name,
+                gender = gender,
+                birth_date = fake.date_between_dates(
+                    min_age + timedelta(days = 18 * 365),
+                    datetime.now().date()
+                ),
+                basement = basements.get(id=current_basement)
+            )
+
+        return validated_data
+    

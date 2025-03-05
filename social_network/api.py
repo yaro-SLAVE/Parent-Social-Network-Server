@@ -161,6 +161,10 @@ class GenerateDataViewSet(
     def get_serializer_class(self):
         if self.action == "generate_users":
             return GenerateUsersSerializer
+        elif self.action == "generate_basements":
+            return GenerateBasementsSerializer
+        elif self.action == "generate_childs":
+            return GenerateChildssSerializer
 
     @action(url_path="users", methods=["POST"], detail = False)
     def generate_users(self, request, *args, **kwargs):
@@ -169,61 +173,11 @@ class GenerateDataViewSet(
         
     
     @action(url_path="basements", methods=["POST"], detail = False)
-    def generate_basements(self, *args, **options):
-        fakers_count = self.request["fakers_count"]
-
-        fake = Faker(['ru_RU'])
-
-        for _ in range(fakers_count / 2):
-            BasementSerializer.create(
-                address = fake.street_address(),
-                capacity = fake.random_number(digits=27)
-            )
+    def generate_basements(self, request, *args, **kwargs):
+        super().create(request, *args, **kwargs)
+        return Response(status=status.HTTP_200_OK)
         
     @action(url_path="childs", methods=["POST"], detail = False)
-    def generate_childs(self, *args, **options):
-        fakers_count = self.request["fakers_count"]
-
-        fake = Faker(['ru_RU'])
-
-        parents_count = UserProfile.objects.count()
-        basements_count = Basement.objects.count()
-
-        for i in range(fakers_count / 2):
-
-            parent_1 = parents_count - fakers_count + 1 + i
-            parent_2 = parents_count - fakers_count / 2 + 1 + i
-            current_basement = basements_count - fakers_count / 2 + 1 +i
-
-            UserBasementSerializer.create(
-                user = parent_1,
-                basement = current_basement
-            )
-
-            UserBasementSerializer.create(
-                user = parent_2,
-                basement = current_basement
-            )
-
-            min_age = max(
-                UserProfile.objects.get(parent_1).user.birth_date,
-                UserProfile.objects.get(parent_2).user.birth_date
-            )
-
-            rand = random.randint(0, 1)
-
-            first_name = ""
-
-            if rand == 0:
-                first_name = fake.first_name_male()
-            else:
-                first_name = fake.first_name_female()
-
-            ChildSerializer.create(
-                first_name = first_name,
-                birth_date = fake.date_between_dates(
-                    min_age - timedelta(days = 18 * 365),
-                    min_age
-                ),
-                basement = current_basement
-            )
+    def generate_childs(self, request, *args, **kwargs):
+        super().create(request, *args, **kwargs)
+        return Response(status=status.HTTP_200_OK)
