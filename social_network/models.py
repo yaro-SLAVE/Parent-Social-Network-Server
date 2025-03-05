@@ -6,6 +6,7 @@ User = get_user_model()
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     logo = models.ImageField("Логотип", upload_to="images", null=True, blank=True)
+    birth_date = models.DateField("Дата рождения", null=True, blank=True)
 
     def __str__(self) -> str:
         return self.user.username
@@ -23,7 +24,6 @@ class UserBasement(models.Model):
 
 class Child(models.Model):
     first_name = models.TextField("Имя")
-    last_name = models.TextField("Фамилия")
     birth_date = models.DateField("Дата рождения")
     basement = models.ForeignKey(Basement, on_delete=models.CASCADE)
 

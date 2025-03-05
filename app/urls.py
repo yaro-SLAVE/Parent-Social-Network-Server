@@ -28,7 +28,6 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 router = DefaultRouter()
 
-router.register("user", UserViewSet, basename="user")
 router.register("profile", UserProfileViewSet, basename="profile")
 router.register("basement", BasementViewSet, basename="basement")
 router.register("user_basement", UserBasementViewSet, basename="user_basement")
@@ -41,6 +40,7 @@ router.register("post_like", PostLikeViewSet, basename="post_like")
 router.register("comment_like", CommentLikeViewSet, basename="comment_like")
 router.register("reaction", ReactionViewSet, basename="reaction")
 router.register("post_reaction", PostReactionViewSet, basename="post_reaction")
+router.register("generate_data", GenerateDataViewSet, basename="generate_data")
 
 urlpatterns = [
     path("admin/", admin.site.urls),
