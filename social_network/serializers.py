@@ -128,9 +128,7 @@ class GenerateUsersSerializer(serializers.Serializer):
     fakers_count = serializers.IntegerField()
 
     def create(self, validated_data):
-        fakers_count = self.context["request"].data["fakers_count"]
-
-        print(fakers_count)
+        fakers_count = int(self.context["request"].data["fakers_count"])
 
         fake = Faker(['ru_RU'])
 
@@ -179,7 +177,7 @@ class GenerateBasementsSerializer(serializers.Serializer):
     fakers_count = serializers.IntegerField()
 
     def create(self, validated_data):
-        fakers_count = self.context["request"].data["fakers_count"]
+        fakers_count = int(self.context["request"].data["fakers_count"])
 
         fake = Faker(['ru_RU'])
 
@@ -191,13 +189,13 @@ class GenerateBasementsSerializer(serializers.Serializer):
 
         return validated_data
     
-class GenerateChildssSerializer(serializers.Serializer):
+class GenerateChildrenSerializer(serializers.Serializer):
     fakers_count = serializers.IntegerField()
 
     def create(self, validated_data):
-        fakers_count = self.context["request"].data["fakers_count"]
+        fakers_count = int(self.context["request"].data["fakers_count"])
 
-        fake = Faker(['ru_RU'])
+        fake = Faker(['ru_RU']) 
 
         parents_count = UserProfile.objects.count()
         basements_count = Basement.objects.count()
@@ -250,3 +248,92 @@ class GenerateChildssSerializer(serializers.Serializer):
 
         return validated_data
     
+class GeneratePostsSerializer(serializers.Serializer):
+    fakers_count = serializers.IntegerField()
+
+    def create(self, validated_data):
+        fakers_count = int(self.context["request"].data["fakers_count"])
+
+        fake = Faker(['ru_RU'])
+
+        parents_count = UserProfile.objects.count()
+        children_count = Child.objects.count()
+
+        parents = UserProfile.objects.all()
+        children = Child.objects.all()
+
+        for i in range(fakers_count):
+            post = Post.objects.create(
+                parents.get(parents_count - fakers_count + 1 + i).user,
+                fake.text(max_nb_chars=20),
+                fake.text(max_nb_chars=250),
+                fake.date_time_between_dates(datetime_start=datetime("2023-04-12", "%Y-%m-%d").date())
+            )
+
+            rand = random.randint(1, 4)
+
+            for _ in range(rand):
+                post_photo = PostPhoto.objects.create(
+                    post,
+                    fake.image_url(500, 800)
+                )
+
+                rand_count = random(1, 2)
+
+                for _ in range(rand_count):
+                    child_id = random(1, children_count)
+                    ChildPhoto.objects.create(
+                        post_photo,
+                        children.get(child_id)
+                    )
+
+            likes_count = random(5, 100)
+
+            for _ in range(likes_count):
+                rand_parent = random(1, parents_count)
+
+                PostLike.objects.create(
+                    post,
+                    parents.get(rand_parent).user,
+                    fake.date_time_between_dates(datetime_start=post.create_time)
+                )
+
+            comment_rand = random(1, 10)
+
+            for _ in range(comment_rand):
+                rand_parent = random(1, parents_count)
+
+                comment = Comment.objects.create(
+                    parents.get(rand_parent).user,
+                    post,
+                    fake.text(max_nb_chars=30),
+                    fake.date_time_between_dates(datetime_start=post.create_time)
+                )
+
+                rand_likes = random(0, 10)
+
+                for _ in range(rand_likes):
+                    rand_parent = random(1, parents_count)
+
+                    CommentLike.objects.create(
+                        comment,
+                        parents.get(rand_parent).user,
+                        fake.date_time_between_dates(datetime_start=comment.date)
+                    )
+
+            rand_reactions = random(1, 10)
+            reactions = Reaction.objects.all()
+            reactions_count = Reaction.objects.count()
+
+            for _ in range(rand_reactions):
+                rand_parent = random(1, parents_count)
+                rand = random(1, reactions_count)
+                
+                PostReaction.objects.create(
+                    post,
+                    parents.get(rand_parent).user,
+                    reactions.get(rand),
+                    fake.date_time_between_dates(datetime_start=post.create_time)
+                )
+
+        return validated_data

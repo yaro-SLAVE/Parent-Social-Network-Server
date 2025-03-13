@@ -163,8 +163,10 @@ class GenerateDataViewSet(
             return GenerateUsersSerializer
         elif self.action == "generate_basements":
             return GenerateBasementsSerializer
-        elif self.action == "generate_childs":
-            return GenerateChildssSerializer
+        elif self.action == "generate_children":
+            return GenerateChildrenSerializer
+        elif self.action == "generate_posts":
+            return GeneratePostsSerializer
 
     @action(url_path="users", methods=["POST"], detail = False)
     def generate_users(self, request, *args, **kwargs):
@@ -177,7 +179,12 @@ class GenerateDataViewSet(
         super().create(request, *args, **kwargs)
         return Response(status=status.HTTP_200_OK)
         
-    @action(url_path="childs", methods=["POST"], detail = False)
-    def generate_childs(self, request, *args, **kwargs):
+    @action(url_path="children", methods=["POST"], detail = False)
+    def generate_children(self, request, *args, **kwargs):
+        super().create(request, *args, **kwargs)
+        return Response(status=status.HTTP_200_OK)
+    
+    @action(url_path="posts", methods=["POST"], detail = False)
+    def generate_posts(self, request, *args, **kwargs):
         super().create(request, *args, **kwargs)
         return Response(status=status.HTTP_200_OK)
