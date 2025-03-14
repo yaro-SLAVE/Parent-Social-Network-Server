@@ -12,15 +12,6 @@ from social_network.serializers import *
 
 from rest_framework.permissions import IsAuthenticated
 
-from django.conf import settings
-
-from faker import Faker
-
-from datetime import datetime
-from datetime import timedelta
-
-import random
-
 class UserProfileViewSet(
     GenericViewSet,
     mixins.CreateModelMixin,

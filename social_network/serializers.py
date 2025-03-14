@@ -264,76 +264,76 @@ class GeneratePostsSerializer(serializers.Serializer):
 
         for i in range(fakers_count):
             post = Post.objects.create(
-                parents.get(parents_count - fakers_count + 1 + i).user,
-                fake.text(max_nb_chars=20),
-                fake.text(max_nb_chars=250),
-                fake.date_time_between_dates(datetime_start=datetime("2023-04-12", "%Y-%m-%d").date())
+                user = parents.get(id=parents_count - fakers_count + 1 + i).user,
+                title = fake.text(max_nb_chars=20),
+                body = fake.text(max_nb_chars=250),
+                create_time = fake.date_time_between_dates(datetime_start=datetime(2023, 4, 5).date())
             )
 
             rand = random.randint(1, 4)
 
             for _ in range(rand):
                 post_photo = PostPhoto.objects.create(
-                    post,
-                    fake.image_url(500, 800)
+                    post = post,
+                    photo = fake.image_url(500, 800)
                 )
 
-                rand_count = random(1, 2)
+                rand_count = random.randint(1, 2)
 
                 for _ in range(rand_count):
-                    child_id = random(1, children_count)
+                    child_id = random.randint(1, children_count)
                     ChildPhoto.objects.create(
-                        post_photo,
-                        children.get(child_id)
+                        photo = post_photo,
+                        child = children.get(id=child_id)
                     )
 
-            likes_count = random(5, 100)
+            likes_count = random.randint(5, 100)
 
             for _ in range(likes_count):
-                rand_parent = random(1, parents_count)
+                rand_parent = random.randint(1, parents_count)
 
                 PostLike.objects.create(
-                    post,
-                    parents.get(rand_parent).user,
-                    fake.date_time_between_dates(datetime_start=post.create_time)
+                    post = post,
+                    user = parents.get(id=rand_parent).user,
+                    date = fake.date_time_between_dates(datetime_start=post.create_time)
                 )
 
-            comment_rand = random(1, 10)
+            comment_rand = random.randint(1, 10)
 
             for _ in range(comment_rand):
-                rand_parent = random(1, parents_count)
+                rand_parent = random.randint(1, parents_count)
 
                 comment = Comment.objects.create(
-                    parents.get(rand_parent).user,
-                    post,
-                    fake.text(max_nb_chars=30),
-                    fake.date_time_between_dates(datetime_start=post.create_time)
+                    user = parents.get(id=rand_parent).user,
+                    post = post,
+                    body = fake.text(max_nb_chars=30),
+                    date = fake.date_time_between_dates(datetime_start=post.create_time)
                 )
 
-                rand_likes = random(0, 10)
+                rand_likes = random.randint(0, 10)
 
                 for _ in range(rand_likes):
-                    rand_parent = random(1, parents_count)
+                    rand_parent = random.randint(1, parents_count)
 
                     CommentLike.objects.create(
-                        comment,
-                        parents.get(rand_parent).user,
-                        fake.date_time_between_dates(datetime_start=comment.date)
+                        comment = comment,
+                        user = parents.get(id=rand_parent).user,
+                        date = fake.date_time_between_dates(datetime_start=comment.date)
                     )
 
-            rand_reactions = random(1, 10)
+            rand_reactions = random.randint(1, 10)
             reactions = Reaction.objects.all()
             reactions_count = Reaction.objects.count()
 
             for _ in range(rand_reactions):
-                rand_parent = random(1, parents_count)
-                rand = random(1, reactions_count)
+                rand_parent = random.randint(1, parents_count)
+                rand = random.randint(1, reactions_count)
                 
                 PostReaction.objects.create(
-                    post,
-                    parents.get(rand_parent).user,
-                    reactions.get(rand),
-                    fake.date_time_between_dates(datetime_start=post.create_time)
+                    post = post,
+                    user = parents.get(id=rand_parent).user,
+                    reaction = reactions.get(id=rand),
+                    date = fake.date_time_between_dates(datetime_start=post.create_time)
                 )
 
         return validated_data
