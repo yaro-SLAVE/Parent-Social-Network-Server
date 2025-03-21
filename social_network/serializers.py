@@ -33,16 +33,38 @@ class UserProfileSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset = User.objects.all(), read_only = False, required = False)
 
     def create(self, validated_data):
-        if (validated_data["user"] is None):
-            user = UserSerializer.create(User, validated_data)
+        user = UserSerializer.create(validated_data)
 
-            validated_data["user"] = user.id
+        validated_data["user"] = user
 
         return super().create(validated_data)
 
     class Meta:
         model = UserProfile
         fields = "__all__"
+
+class CreateProfileSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=50)
+    password = serializers.CharField(max_length=50)
+    first_name = serializers.CharField(max_length=50)
+    last_name = serializers.CharField(max_length=50)
+    birth_date = serializers.DateField()
+
+    def create(self, validated_data):
+        user = User.objects.create(
+            username = validated_data['username'],
+            password = make_password(validated_data['password']),
+            first_name = validated_data['first_name'],
+            last_name = validated_data['last_name'], 
+            is_active = True
+        )
+
+        profile = UserProfile.objects.create(
+            user=user,
+            birth_date=validated_data['birth_date']
+        )
+
+        return validated_data
 
 class BasementSerializer(serializers.ModelSerializer):
     class Meta:

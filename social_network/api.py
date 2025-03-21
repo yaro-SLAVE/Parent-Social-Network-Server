@@ -21,7 +21,12 @@ class UserProfileViewSet(
     mixins.UpdateModelMixin
 ):
     queryset = UserProfile.objects.all()
-    serializer_class = UserProfileSerializer
+    
+    def get_serializer_class(self):
+        if self.action == "create":
+            return CreateProfileSerializer
+        else:
+            return UserProfileSerializer
 
 class BasementViewSet(
     GenericViewSet,
