@@ -48,7 +48,7 @@ class CreateProfileSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=50)
     first_name = serializers.CharField(max_length=50)
     last_name = serializers.CharField(max_length=50)
-    birth_date = serializers.DateField()
+    birth_date = serializers.DateField(required = False)
 
     def create(self, validated_data):
         user = User.objects.create(
@@ -59,10 +59,15 @@ class CreateProfileSerializer(serializers.Serializer):
             is_active = True
         )
 
-        profile = UserProfile.objects.create(
-            user=user,
-            birth_date=validated_data['birth_date']
-        )
+        if ('birth_date' in validated_data):
+            profile = UserProfile.objects.create(
+                user=user,
+                birth_date=validated_data['birth_date']
+            )
+        else:
+            profile = UserProfile.objects.create(
+                user=user
+            )
 
         return validated_data
 
@@ -143,7 +148,7 @@ class PostReactionSerializer(serializers.ModelSerializer):
     reaction = serializers.PrimaryKeyRelatedField(queryset = Reaction.objects.all(), read_only = False, required = False)
 
     class Meta:
-        model = Comment
+        model = PostReaction
         fields = "__all__"
 
 class GenerateUsersSerializer(serializers.Serializer):
@@ -312,7 +317,9 @@ class GeneratePostsSerializer(serializers.Serializer):
             likes_count = random.randint(5, 100)
 
             for _ in range(likes_count):
-                rand_parent = random.randint(1, parents_count)
+                rand_parent = 0
+                while (parents.get(id=rand_parent).DoesNotExist):
+                    rand_parent = random.randint(1, parents_count)                
 
                 PostLike.objects.create(
                     post = post,
@@ -323,7 +330,9 @@ class GeneratePostsSerializer(serializers.Serializer):
             comment_rand = random.randint(1, 10)
 
             for _ in range(comment_rand):
-                rand_parent = random.randint(1, parents_count)
+                rand_parent = 0
+                while (parents.get(id=rand_parent).DoesNotExist):
+                    rand_parent = random.randint(1, parents_count) 
 
                 comment = Comment.objects.create(
                     user = parents.get(id=rand_parent).user,
@@ -335,7 +344,9 @@ class GeneratePostsSerializer(serializers.Serializer):
                 rand_likes = random.randint(0, 10)
 
                 for _ in range(rand_likes):
-                    rand_parent = random.randint(1, parents_count)
+                    rand_parent = 0
+                while (parents.get(id=rand_parent).DoesNotExist):
+                    rand_parent = random.randint(1, parents_count) 
 
                     CommentLike.objects.create(
                         comment = comment,
@@ -348,7 +359,10 @@ class GeneratePostsSerializer(serializers.Serializer):
             reactions_count = Reaction.objects.count()
 
             for _ in range(rand_reactions):
-                rand_parent = random.randint(1, parents_count)
+                rand_parent = 0
+                while (parents.get(id=rand_parent).DoesNotExist):
+                    rand_parent = random.randint(1, parents_count) 
+
                 rand = random.randint(1, reactions_count)
                 
                 PostReaction.objects.create(
