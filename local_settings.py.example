@@ -1,4 +1,8 @@
 from app.settings import *
+from pymongo import MongoClient
+from mongoengine import connect
+
+for ms sql
 
 DATABASES = {
     'default':{
@@ -10,3 +14,13 @@ DATABASES = {
         },
     }
 }
+
+for mongo db
+
+MONGO_HOST = ''
+MONGO_DB = ''
+connect(MONGO_DB, host=MONGO_HOST)
+
+for data-migrations from other DB
+MONGO_CLIENT = MongoClient('')
+MONGO_DB = MONGO_CLIENT['']

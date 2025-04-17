@@ -1,4 +1,4 @@
-django==5.0.12
+django==5.0.14
 mssql-django==1.5
 djangorestframework==3.15.2
 rest_framework_simplejwt==0.0.2
@@ -6,3 +6,6 @@ Pillow==11.1.0
 faker==36.1.1
 faker-graphics==0.3.0
 structlog==25.1.0
+djangotoolbox==1.8.0
+mongoengine==0.29.1
+pymongo==3.11.4

@@ -12,6 +12,8 @@ from social_network.serializers import *
 
 from rest_framework.permissions import IsAuthenticated
 
+from django.db.models import Count
+
 class UserProfileViewSet(
     GenericViewSet,
     mixins.CreateModelMixin,
@@ -27,6 +29,14 @@ class UserProfileViewSet(
             return CreateProfileSerializer
         else:
             return UserProfileSerializer
+        
+    def get_queryset(self):
+        print(len(super().get_queryset()))
+        last_name = self.request.GET.get("last_name")
+        user_ids = User.objects.filter(last_name__contains = last_name).all()
+        queryset = super().get_queryset().filter(user__in = user_ids)
+        print(len(queryset))
+        return queryset
 
 class BasementViewSet(
     GenericViewSet,
@@ -38,6 +48,11 @@ class BasementViewSet(
 ):
     queryset = Basement.objects.all()
     serializer_class = BasementSerializer
+
+    def get_queryset(self):
+        capacity = self.request.GET.get('capacity')
+        print(capacity)
+        return super().get_queryset().filter(capacity = capacity).annotate(Count("id")).order_by('-id__count')[:10]
 
 class UserBasementViewSet(
     GenericViewSet,
@@ -72,6 +87,9 @@ class PostViewSet(
     queryset = Post.objects.all()
     serializer_class = PostSerializer
 
+    def get_queryset(self):
+        return super().get_queryset().annotate(title_count = Count("title")).order_by('-title_count')[:50]
+
 class PostPhotoViewSet(
     GenericViewSet,
     mixins.CreateModelMixin,
@@ -105,6 +123,11 @@ class CommentViewSet(
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
+    def get_queryset(self):
+        user_id = self.request.GET.get("user")
+        user = User.objects.get(pk = user_id)
+        return super().get_queryset().filter(user = user).annotate(Count("id")).order_by('-id__count')[:50]
+
 class PostLikeViewSet(
     GenericViewSet,
     mixins.CreateModelMixin,
@@ -116,6 +139,9 @@ class PostLikeViewSet(
     queryset = PostLike.objects.all()
     serializer_class = PostLikeSerializer
 
+    def get_queryset(self):
+        return super().get_queryset().annotate(Count("id")).order_by('-id__count')[:30]
+
 class CommentLikeViewSet(
     GenericViewSet,
     mixins.CreateModelMixin,
@@ -126,6 +152,9 @@ class CommentLikeViewSet(
 ):
     queryset = CommentLike.objects.all()
     serializer_class = CommentLikeSerializer
+
+    def get_queryset(self):
+        return super().get_queryset().annotate(Count("id")).order_by('-id__count')[:60]
 
 class ReactionViewSet(
     GenericViewSet,
@@ -148,6 +177,9 @@ class PostReactionViewSet(
 ):
     queryset = PostReaction.objects.all()
     serializer_class = PostReactionSerializer
+
+    def get_queryset(self):
+        return super().get_queryset().annotate(Count("id")).order_by('-id__count')[:30]
 
 class GenerateDataViewSet(
     GenericViewSet,

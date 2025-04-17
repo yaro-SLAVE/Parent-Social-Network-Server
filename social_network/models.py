@@ -63,7 +63,7 @@ class Comment(models.Model):
 class PostLike(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    date = models.DateTimeField("Дата установки лайка")
+    date = models.DateTimeField("Дата установки лайка", auto_now_add=True, blank=True)
 
 class CommentLike(models.Model):
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
@@ -81,4 +81,4 @@ class PostReaction(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     reaction = models.ForeignKey(Reaction, on_delete=models.CASCADE)
-    date = models.DateTimeField("Дата установки реакции")
+    date = models.DateTimeField("Дата установки реакции", auto_now_add=True, blank=True)

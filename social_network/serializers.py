@@ -125,6 +125,9 @@ class PostLikeSerializer(serializers.ModelSerializer):
     post = serializers.PrimaryKeyRelatedField(queryset = Post.objects.all(), read_only = False, required = False)
     user = serializers.PrimaryKeyRelatedField(queryset = User.objects.all(), read_only = False, required = False)
 
+    def create(self, validated_data):
+        return super().create(validated_data)
+
     class Meta:
         model = PostLike
         fields = "__all__"
